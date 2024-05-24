@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Juego {
     private Mazo mazo = new Mazo();
-    private Carta[][] matriz_turnos = new Carta[2][3];
+    private Carta matriz_turnos [][] = new Carta[3][2];
     private int turno = 0;
     private LinkedList<Jugador> jugadores = new LinkedList<>();
 
@@ -36,9 +36,7 @@ public class Juego {
         jugadores.add(jugador);
     }
 
-    public void agregarJugadores(){
 
-    }
 
     public LinkedList<Jugador> getJugadores() {
         return jugadores;
@@ -132,6 +130,7 @@ public class Juego {
                     }
                     if (compararCartasIguales(carta, cartaGanadora)) {
                         numeroJugador = columna + 1;
+                        break;
                     }
                 }
             }
@@ -183,12 +182,11 @@ public class Juego {
 
         Carta cartaGanadora = definirCartaGanadora(carta1,carta2); // defino cual gana
 
-        if (turnoActual == 0){  // si es el primer turno, salgo porque tengo que manejarlo de otra forma
-            return null;
-        }
 
         if (cartaGanadora == null){  // si empatan, gana el jugador con primera
-            aumentarContadorJugadorGanador(getJugadorConPrimera());
+            if (turno != 0) {
+                aumentarContadorJugadorGanador(getJugadorConPrimera());
+            }
             return null;
         }
 
@@ -220,7 +218,7 @@ public class Juego {
     }
 
     public void resetearMatriz(){
-        this.matriz_turnos = new Carta[2][3];
+        this.matriz_turnos = new Carta[3][2];
     }
 
     public void mostrarMatriz(){
@@ -276,37 +274,77 @@ public class Juego {
     public boolean verificarSiGanoAlgunJugador(){
         for (Jugador jugador: jugadores){
             if (jugador.getPuntajeTotal() > 14){ // si algun jugador tiene 15 puntos, devuelve true
+                System.out.println("Ganador: " + jugador.getNombre());
                 return true;
             }
         }
         return false; // si todavia no se alcanzaron los 15 puntos, devuelve false
     }
 
-    public Object definirPrimerTurno(AtomicBoolean primerTurno, Jugador jugador1, Jugador jugador2){
+    public Object definirPrimerTurno(AtomicBoolean primerTurno){
         boolean valorPrimerTurno = primerTurno.get();
         if (!valorPrimerTurno){  // si no es el primer turno, finaliza la ejecucion
             return null;
         }
 
-        primerTurno.set(true);
-        if (jugador1.isEsMano()){
-            jugador1.setTurno(false);
-            jugador2.setTurno(true);
+        primerTurno.set(false);
+        if (jugadores.get((0)).isEsMano()){
+            jugadores.get(0).setTurno(false);
+            jugadores.get(1).setTurno(true);
+
         }
         else {
-            jugador2.setTurno(true);
-            jugador1.setTurno(false);
+            jugadores.get(1).setTurno(false);
+            jugadores.get(0).setTurno(true);
         }
 
         return null;
     }
 
+    public void definirManoJugador(Jugador j1, Jugador j2){
+        if (j1.isEsMano()){
+            j1.setEsMano(false);
+            j2.setEsMano(true);
+        } else {
+            j2.setEsMano(false);
+            j1.setEsMano(true);
+        }
+    }
+
+    public void jugarCarta(int opcion, Jugador jugador){
+        Mano manoJugador = jugador.getMano();
+        Carta carta = manoJugador.devolverCartaPorInidice(opcion);
+        agregarCartaMatriz(jugador, carta);
+        manoJugador.lanzarCarta(carta);
+        quitarTurnoYDarseloAlSiguiente(jugador);
+    }
+
+    public boolean cartasEmpataron(Carta carta1, Carta carta2){
+        return (carta1.getJerarquia() == carta2.getJerarquia());
+    }
+
+    public int numeroJugadorQueGano(Carta cartaJugador1, Carta cartaJugador2){
+        if (cartaJugador1.getJerarquia() > cartaJugador2.getJerarquia()){
+            return 1;
+        } else if (cartaJugador1.getJerarquia() < cartaJugador2.getJerarquia()){
+            return 2;
+        } else return 0;
+
+    }
+
+    public int parda() {
+        if (verificarSiSeEmpatoPrimerMano()) {
+            Carta carta1 = matriz_turnos[turno - 1][0];
+            Carta carta2 = matriz_turnos[turno - 1][1];
+            Carta carta1turnoActual = matriz_turnos[turno][0];
+            Carta carta2turnoActual = matriz_turnos[turno][1];
+            if (cartasEmpataron(carta1, carta2)) {  // si empataron la mano anterior
+                return numeroJugadorQueGano(carta1turnoActual, carta2turnoActual);
+            }
+        }
+
+        return 0;
+    }
 
 
-
-
-
-
-
-
-}
+    }

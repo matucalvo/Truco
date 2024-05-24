@@ -1,13 +1,12 @@
 import truco.clases.Mazo;
+import truco.clases.GameFlow;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
-        Mazo mazo = new Mazo();
-
-        mazo.inicializarMazo();
-        mazo.mezclarMazo();
-        mazo.mostrarMazo();
+        GameFlow juego = new GameFlow();
+        juego.iniciarPartida();
 
 
 

@@ -69,6 +69,15 @@ public class Jugador {
     public void jugarCarta(Carta carta){
         mano.lanzarCarta(carta);
     }
+
+    public boolean jugadorManoEsVacia(){
+        return mano.manoEsVacia();
+    }
+
+
+
 }
+
+
 
 

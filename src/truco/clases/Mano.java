@@ -58,12 +58,17 @@ public class Mano {
 
     public void lanzarCarta(Carta carta) {
         int i = 0;
+        int indice = 100;
         for (Carta cartaEnLista: mano){
-            i++;
             if (cartaEnLista.equals(carta)){
-                mano.remove(i);
+                indice = i;
             }
+            i++;
         }
+        if (indice != 100){
+            mano.remove(indice);
+        }
+
     }
 
 
